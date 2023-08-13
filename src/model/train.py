@@ -33,7 +33,8 @@ def main(args):
 
 def get_csvs_df(path):
     if not os.path.exists(path):
-        raise RuntimeError(f"Cannot use non-existent path provided: {path}")
+        raise RuntimeError(
+            f"Cannot use non-existent path provided: {path}")
     csv_files = glob.glob(f"{path}/*.csv")
     if not csv_files:
         raise RuntimeError(f"No CSV files found in provided data path: {path}")
@@ -65,7 +66,8 @@ def parse_args():
     parser = argparse.ArgumentParser()
     # add arguments
     parser.add_argument("--training_data", dest='training_data', type=str)
-    parser.add_argument("--reg_rate", dest='reg_rate', type=float, default=0.01)
+    parser.add_argument(
+        "--reg_rate", dest='reg_rate', type=float, default=0.01)
     # parse args
     args = parser.parse_args()
     # return args
