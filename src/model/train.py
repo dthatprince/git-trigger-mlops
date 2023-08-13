@@ -8,7 +8,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 
-
 # define functions
 def main(args):
     mlflow.start_run()
@@ -29,7 +28,6 @@ def main(args):
     # end run
     mlflow.end_run()
 
-
 def get_csvs_df(path):
     if not os.path.exists(path):
         raise RuntimeError(f"Cannot use non-existent path provided: {path}")
@@ -38,7 +36,6 @@ def get_csvs_df(path):
         raise RuntimeError(f"No CSV files found in provided data path: {path}")
     return pd.concat((pd.read_csv(f) for f in csv_files), sort=False)
 
-
 def split_data(df):
     """Splits data into training and testing sets."""
     if "label" not in df.columns:
@@ -46,7 +43,6 @@ def split_data(df):
     X = df.drop(columns=['label'])
     y = df['label']
     return train_test_split(X, y, test_size=0.3, random_state=0)
-
 
 def train_model(reg_rate, X_train, X_test, y_train, y_test):
     # train model
@@ -58,7 +54,6 @@ def train_model(reg_rate, X_train, X_test, y_train, y_test):
     accuracy = accuracy_score(y_test, y_pred)
     return accuracy
 
-
 def parse_args():
     # setup arg parser
     parser = argparse.ArgumentParser()
@@ -69,7 +64,6 @@ def parse_args():
     args = parser.parse_args()
     # return args
     return args
-
 
 # run script
 if __name__ == "__main__":
