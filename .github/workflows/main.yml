@@ -1,3 +1,33 @@
-    - name: Placeholder
-      run: |
-        echo "Will add code checks here in next challenge"
+name: Diabetes Prediction Workflow
+on:
+  push:
+    branches:
+      - main
+jobs:
+  experiment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Azure Machine Learning
+        uses: azure/setup-aci@v1
+        with:
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          resource-group: my-resource-group
+          workspace-name: my-workspace
+      - name: Train model in development environment
+        run: |
+          python train.py diabetes-dev-folder
+  production:
+    needs: experiment
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Azure Machine Learning
+        uses: azure/setup-aci@v1
+        with:
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          resource-group: my-resource-group
+          workspace-name: my-workspace
+      - name: Train model in production environment
+        run: |
+          python train.py diabetes-prod-folder
