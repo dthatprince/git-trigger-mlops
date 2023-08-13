@@ -11,6 +11,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 
 
+
 def main(args):
     mlflow.start_run()
     mlflow.sklearn.autolog()
