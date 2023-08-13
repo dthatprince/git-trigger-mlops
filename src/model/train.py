@@ -11,6 +11,7 @@ import numpy as np
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
 
 # define functions
 def main(args):
@@ -33,7 +34,6 @@ def main(args):
     # end run
     mlflow.end_run()
 
-
 def get_csvs_df(path):
     if not os.path.exists(path):
         raise RuntimeError(f"Cannot use non-existent path provided: {path}")
@@ -44,7 +44,6 @@ def get_csvs_df(path):
 
 
 # TO DO: add function to split data
-from sklearn.model_selection import train_test_split
 def split_data(df):
     """Splits data into training and testing sets."""
     if "label" not in df.columns:
