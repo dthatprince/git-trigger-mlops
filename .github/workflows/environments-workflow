@@ -1,4 +1,4 @@
-name: CI Workflow
+name: Diabetes Prediction
 
 on:
   push:
@@ -8,24 +8,53 @@ on:
 jobs:
   experiment:
     runs-on: ubuntu-latest
-    environment: development
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+      - uses: azure/login@v1
+        with:
+          tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+          client_id: ${{ secrets.AZURE_CLIENT_ID }}
+          client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
 
-    - name: Train model (experiment)
-      # Add steps to train your model using the diabetes-dev-folder dataset
-      # This might involve setting up Azure CLI, Azure Machine Learning CLI, etc.
-      
+      - uses: azure/machinelearning@v1
+        with:
+          subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          workspace_name: myworkspace
+
+      - name: Train model
+        run: |
+          python train.py diabetes-dev-folder
+
   production:
     needs: experiment
     runs-on: ubuntu-latest
-    environment:
-      name: production
-      url: ${{ steps.deploy.outputs.url }}
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+      - uses: azure/login@v1
+        with:
+          tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+          client_id: ${{ secrets.AZURE_CLIENT_ID }}
+          client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
 
-    - name: Train model (production)
-      # Add steps to train your model using the diabetes-prod-folder dataset
+      - uses: azure/machinelearning@v1
+        with:
+          subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          workspace_name: myworkspace
+
+      - name: Train model
+        run: |
+          python train.py diabetes-prod-folder
+
+      - name: Approve production job
+        if: ${{ success('experiment') }}
+        uses: actions/github-script@v1
+        with:
+          script: |
+            const { Octokit } = require('@octokit/core');
+
+            const octokit = new Octokit({
+              auth: process.env.GITHUB_TOKEN,
+            });
+
+            await octokit.post(`/repos/${process.env.GITHUB_REPOSITORY}/actions/runs/${github.run_id}/approve`);
+
