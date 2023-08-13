@@ -1,0 +1,31 @@
+name: CI Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  experiment:
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Train model (experiment)
+      # Add steps to train your model using the diabetes-dev-folder dataset
+      # This might involve setting up Azure CLI, Azure Machine Learning CLI, etc.
+      
+  production:
+    needs: experiment
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Train model (production)
+      # Add steps to train your model using the diabetes-prod-folder dataset
