@@ -3,26 +3,28 @@ import argparse
 import glob
 import os
 import mlflow
-from mlflow import sklearn
 import pandas as pd
-import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 
 # define functions
 def main(args):
-    # TO DO: enable autologging
     mlflow.start_run()
     mlflow.sklearn.autolog()
+
     # read data
     df = get_csvs_df(args.training_data)
+
     # split data
     X_train, X_test, y_train, y_test = split_data(df)
+
     # train model
-    train_model(args.reg_rate, X_train, X_test, y_train, y_test)
+    accuracy = train_model(args.reg_rate, X_train, X_test, y_train, y_test)
+
     # Log the metric with MLflow
     mlflow.log_metric("accuracy", accuracy)
+
     # end run
     mlflow.end_run()
 
