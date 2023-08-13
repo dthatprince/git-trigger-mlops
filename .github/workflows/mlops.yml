@@ -1,33 +1,60 @@
 name: Diabetes Prediction Workflow
+
 on:
   push:
     branches:
       - main
+
+env:
+  RESOURCE_GROUP: my-resource-group
+  WORKSPACE_NAME: my-workspace
+  REQUIREMENTS_PATH: 'path/to/requirements.txt'  # Change this to the path of your requirements.txt file
+
 jobs:
   experiment:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup Azure Machine Learning
-        uses: azure/setup-aci@v1
-        with:
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          resource-group: my-resource-group
-          workspace-name: my-workspace
-      - name: Train model in development environment
-        run: |
-          python train.py diabetes-dev-folder
+    - uses: actions/checkout@v2
+    
+    - name: Set up Python Environment
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+        pip install -r ${{ env.REQUIREMENTS_PATH }}
+    
+    - name: Setup Azure Machine Learning
+      uses: azure/setup-aml-workspace@v1  # This is a hypothetical action for AML; replace with a suitable one
+      with:
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        resource-group: ${{ env.RESOURCE_GROUP }}
+        workspace-name: ${{ env.WORKSPACE_NAME }}
+    
+    - name: Train model in development environment
+      run: |
+        source venv/bin/activate
+        python train.py diabetes-dev-folder
+
   production:
     needs: experiment
+    environment: production  # Assumes you've set up an environment in GitHub named 'production' with protection rules for approvals
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup Azure Machine Learning
-        uses: azure/setup-aci@v1
-        with:
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          resource-group: my-resource-group
-          workspace-name: my-workspace
-      - name: Train model in production environment
-        run: |
-          python train.py diabetes-prod-folder
+    - uses: actions/checkout@v2
+    
+    - name: Set up Python Environment
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+        pip install -r ${{ env.REQUIREMENTS_PATH }}
+    
+    - name: Setup Azure Machine Learning
+      uses: azure/setup-aml-workspace@v1  # This is a hypothetical action for AML; replace with a suitable one
+      with:
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        resource-group: ${{ env.RESOURCE_GROUP }}
+        workspace-name: ${{ env.WORKSPACE_NAME }}
+    
+    - name: Train model in production environment
+      run: |
+        source venv/bin/activate
+        python train.py diabetes-prod-folder
